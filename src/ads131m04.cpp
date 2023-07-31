@@ -3,7 +3,8 @@
 
 using namespace ads131m04;
 
-bool cADS131M04::begin(SPIClass* pSpi, int8_t chipSelectPin, int8_t clockOutPin, int8_t clockChannel)
+bool cADS131M04::begin(SPIClass* pSpi, int8_t chipselect_dc_1,int8_t chipselect_dc_2,
+                       int8_t clockOutPin, int8_t clockChannel)
 {
     if (pSpi == nullptr)
     {
@@ -12,13 +13,17 @@ bool cADS131M04::begin(SPIClass* pSpi, int8_t chipSelectPin, int8_t clockOutPin,
         return false;
     }
 
-    this->m_chipSelectPin = chipSelectPin;
+    this->m_chipSelectPin = chipselect_dc_1;
+    this->m_chipSelectPin_2 = chipselect_dc_2;
     this->m_clockOutPin = clockOutPin;
     this->m_pSpi = pSpi;
     this->m_clockChannel = clockChannel;
 
     pinMode(this->m_chipSelectPin, OUTPUT);
+    pinMode(this->m_chipSelectPin_2, OUTPUT);
+
     digitalWrite(this->m_chipSelectPin, HIGH);
+    digitalWrite(this->m_chipSelectPin_2, HIGH);
 
     this->m_pSpi->begin();
 
@@ -130,6 +135,7 @@ bool cADS131M04::writeRegister(uint8_t registerAddr, uint16_t data)
     uint16_t commandWord = (int)(Command::Write) | (registerAddr << 7) | 0;
 
     digitalWrite(this->m_chipSelectPin, LOW);
+    digitalWrite(this->m_chipSelectPin_2, LOW);
     this->m_pSpi->beginTransaction(SPISettings((std::uint32_t)SpeedSettings::SerialClock, MSBFIRST, (std::uint8_t)SPI_MODE1));
 
     this->spiTransferWord(commandWord);
@@ -144,6 +150,7 @@ bool cADS131M04::writeRegister(uint8_t registerAddr, uint16_t data)
 
     this->m_pSpi->endTransaction();
     digitalWrite(this->m_chipSelectPin, HIGH);
+    digitalWrite(this->m_chipSelectPin_2, HIGH);
 
     // Get response
     uint32_t pBuffer[6];
@@ -162,6 +169,7 @@ bool cADS131M04::writeRegister(uint8_t registerAddr, uint16_t data)
 void cADS131M04::spiCommFrame(uint32_t * pOutput, uint16_t command)
 {
     digitalWrite(this->m_chipSelectPin, LOW);
+    digitalWrite(this->m_chipSelectPin_2, LOW);
 
     this->m_pSpi->beginTransaction(SPISettings((std::uint32_t)SpeedSettings::SerialClock, MSBFIRST, (std::uint8_t)SPI_MODE1));
 
@@ -182,6 +190,7 @@ void cADS131M04::spiCommFrame(uint32_t * pOutput, uint16_t command)
     this->m_pSpi->endTransaction();
 
     digitalWrite(this->m_chipSelectPin, HIGH);
+    digitalWrite(this->m_chipSelectPin_2, HIGH);
 }
 
 uint32_t cADS131M04::spiTransferWord(uint16_t inputData)

@@ -7,7 +7,7 @@
 
 #include "SPI.h"
 
-#define LMP_SPI_MODE            arduino::SPI_MODE2                             // Can be 3 0 1
+#define LMP_SPI_MODE            arduino::SPI_MODE0                             // Can be 3 0 1
 #define LMP_SPI_FREQ            10000000
 
 #define LMP91050_DEV_CONFIG_REG                         (0x00)                  // Device Configuration
@@ -24,12 +24,15 @@
 class lmp91050 {
 private:
     SPIClass * _spi{};
+    uint8_t _pin_SDIO{};
     uint8_t _cs{};
+    uint8_t _cs2{};
+    uint8_t _state{};
     void writeRegister(uint8_t addr, uint8_t value);
     uint8_t readRegister(uint8_t addr);
 public:
     lmp91050();         // Constructor of the object
-    void begin(SPIClass *userSPI,uint8_t userCS);       // starter function ( SPI class , CS pin )
+    void begin(SPIClass *userSPI, uint8_t pin_SDIO ,uint8_t userCS, uint8_t userCS2, bool state);       // starter function ( SPI class , CS pin )
     void modeSDIO(bool state); // SDIO --> open read mode (True)
     void writeDevConf(uint8_t conf); // Write device config 8 bit 00000000
     uint8_t readDevConf();

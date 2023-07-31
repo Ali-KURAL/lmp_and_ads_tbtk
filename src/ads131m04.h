@@ -185,7 +185,8 @@ namespace ads131m04 {
         /// \return
         ///     \c true for success, \c false for failure.
         ///
-        bool begin(SPIClass* pSpi, int8_t chipSelectPin = 17, int8_t clockOutPin = D12, int8_t clockChannel = 1);
+        bool begin(SPIClass* pSpi, int8_t chipselect_dc_1  = 17, int8_t chipselect_dc_2 = 18,
+                   int8_t clockOutPin = D12, int8_t clockChannel = 1);
 
         ///
         /// \brief Read ID and check connectivity before begin.
@@ -271,7 +272,7 @@ namespace ads131m04 {
         bool writeRegister(uint8_t registerAddr, uint16_t data);
 
     private:
-        int8_t m_chipSelectPin{}, m_clockOutPin{}, m_clockChannel{};
+        int8_t m_chipSelectPin{},m_chipSelectPin_2{}, m_clockOutPin{}, m_clockChannel{};
         SPIClass* m_pSpi{};
         bool m_Initialized;
         float m_fsr = 1.65;
